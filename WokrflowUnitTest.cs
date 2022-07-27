@@ -30,9 +30,10 @@ namespace Workflow.TestProject
 
         public void CreateTemporalConnection()
         {
-            var temporalConnection = new ProviderConnection{ 
-                Name = "VirtoCommerceTemporalWorkflow", 
-                Provider = "Workflow", 
+            var temporalConnection = new ProviderConnection
+            {
+                Name = "VirtoCommerceTemporalWorkflow",
+                Provider = "Workflow",
                 ConnectionString = "parh=https://localhost;connectionType=Localhost;tlsEnabled=0;namespace=Namespace;serverCertAuthorityPemFilePath="
             };
 
@@ -44,7 +45,8 @@ namespace Workflow.TestProject
             var submitFormSubscription = new SubscriptionInfo
             {
                 ProviderConnectionName = "VirtoCommerceTemporalWorkflow",
-                Configuration = new WorkflowConfiguration { 
+                Configuration = new WorkflowConfiguration
+                {
                     ActionType = WorkflowActionType.StartWorkflow,
                     ActionNameTemplate = "{{eventType}}",
                     WorkflowIdTemplate = "{{eventType}}-{{entity.companyName}}" // Support Liqued Templates to resolve workflow id from event data
@@ -79,7 +81,7 @@ namespace Workflow.TestProject
         {
             var companyRegistrationForm = new BusinessFormSubmitedEvent
             {
-                Id = "54ED6B7F-EABF-47DB-8162-CBEF8A2DCC38", 
+                Id = "54ED6B7F-EABF-47DB-8162-CBEF8A2DCC38",
                 FirstName = "Ben",
                 LastName = "Black",
                 Email = "ben.black@virtoway.com",
@@ -87,7 +89,7 @@ namespace Workflow.TestProject
                 Phone = "+36586633256",
                 TermConditonsAccepted = true
             };
-            
+
             // Fire and Forger
             _eventPublisher.Publish(companyRegistrationForm);
 
@@ -103,7 +105,8 @@ namespace Workflow.TestProject
             Assert.Equal("BusinessFormSubmitedEvent", workflowInfo.Name);
 
             // TODO: Workflow calls API and creates task
-            var task = new TaskAssignment { 
+            var task = new TaskAssignment
+            {
                 Id = "{819F54D3-36C7-4828-B408-4F6772DC1114}",
                 Type = "ApproveDecline",
                 Description = "Review a new Company Registration request.",
@@ -163,3 +166,4 @@ namespace Workflow.TestProject
 
         }
     }
+}
