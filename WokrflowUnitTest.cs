@@ -34,7 +34,7 @@ namespace Workflow.TestProject
             {
                 Name = "VirtoCommerceTemporalWorkflow",
                 Provider = "Workflow",
-                ConnectionString = "parh=https://localhost;connectionType=Localhost;tlsEnabled=0;namespace=Namespace;serverCertAuthorityPemFilePath="
+                ConnectionString = "path=https://localhost;connectionType=Localhost;tlsEnabled=0;namespace=Namespace;serverCertAuthorityPemFilePath="
             };
 
             _subscriptionsManager.AddConnection(temporalConnection);
@@ -49,7 +49,7 @@ namespace Workflow.TestProject
                 {
                     ActionType = WorkflowActionType.StartWorkflow,
                     ActionNameTemplate = "{{eventType}}",
-                    WorkflowIdTemplate = "{{eventType}}-{{entity.companyName}}" // Support Liqued Templates to resolve workflow id from event data
+                    WorkflowIdTemplate = "{{eventType}}-{{companyName}}" // Support Liqued Templates to resolve workflow id from event data
 
                 },
                 Events = new string[] { "Workflow.TestProject.BusinessForms.BusinessFormSubmitedEvent" }
@@ -66,8 +66,8 @@ namespace Workflow.TestProject
                 Configuration = new WorkflowConfiguration
                 {
                     ActionType = WorkflowActionType.SendSignal,
-                    ActionNameTemplate = "{{eventType}}",
-                    WorkflowIdTemplate = "{{eventType}}-{{entity.companyName}}" // Support Liqued Templates to resolve workflow id from event data
+                    ActionNameTemplate = "{{entity.resultData.result}}", // Approved Or Declined
+                    WorkflowIdTemplate = "{{entity.OuterId}}" // Support Liqued Templates to resolve workflow id from event data
 
                 },
                 Events = new string[] { "Workflow.TestProject.TaskAssignments.TaskCompletedEvent" }
@@ -76,8 +76,10 @@ namespace Workflow.TestProject
             _subscriptionsManager.AddSubscription(taskCompletedSubscription);
         }
 
+
+
         [Fact]
-        public void CustomerSubmitCompanyRegistrationForm_WorkflowStarted()
+        public void CustomerSubmitCompanyRegistrationForm()
         {
             var companyRegistrationForm = new BusinessFormSubmitedEvent
             {
@@ -138,6 +140,16 @@ namespace Workflow.TestProject
 
             // Fire and Forger
             _eventPublisher.Publish(new TaskCompletedEvent { Entity = task });
+
+
+            // TODO: Sleep ???
+
+            // Workflow Should be started on SubmitFormSubsription
+            var workflowId = "BusinessFormSubmitedEvent-VirtoCommerce"; // Like WorkflowIdTemplate resolve it
+            var workflowInfo = _workflowManager.GetWorkflow(workflowId);
+
+            Assert.NotNull(workflowId);
+            Assert.Equal("Completed", workflowInfo.Status);
         }
 
         [Fact]
@@ -164,6 +176,14 @@ namespace Workflow.TestProject
             // Fire and Forger
             _eventPublisher.Publish(new TaskCompletedEvent { Entity = task });
 
+            // TODO: Sleep ???
+
+            // Workflow Should be started on SubmitFormSubsription
+            var workflowId = "BusinessFormSubmitedEvent-VirtoCommerce"; // Like WorkflowIdTemplate resolve it
+            var workflowInfo = _workflowManager.GetWorkflow(workflowId);
+
+            Assert.NotNull(workflowId);
+            Assert.Equal("Completed", workflowInfo.Status);
         }
     }
 }
