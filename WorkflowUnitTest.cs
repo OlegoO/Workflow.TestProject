@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Workflow.TestProject
 {
-    public class WokrflowUnitTest
+    public class WorkflowUnitTest
     {
         IEventBusSubscriptionsManager _subscriptionsManager;
         IWorkflowManager _workflowManager;
@@ -16,7 +16,7 @@ namespace Workflow.TestProject
 
         public string WorkflowIdTemplate { get; private set; }
 
-        public WokrflowUnitTest()
+        public WorkflowUnitTest()
         {
             _subscriptionsManager = new Mock<IEventBusSubscriptionsManager>().Object;
             _workflowManager = new Mock<IWorkflowManager>().Object;
@@ -48,8 +48,8 @@ namespace Workflow.TestProject
                 Configuration = new WorkflowConfiguration
                 {
                     ActionType = WorkflowActionType.StartWorkflow,
-                    ActionNameTemplate = "{{eventType}}",
-                    WorkflowIdTemplate = "{{eventType}}-{{companyName}}" // Support Liqued Templates to resolve workflow id from event data
+                    ActionNameTemplate = "{{type}}",
+                    WorkflowIdTemplate = "{{type}}-{{form.companyName}}" // Support Liqued Templates to resolve workflow id from event data
 
                 },
                 Events = new string[] { "Workflow.TestProject.BusinessForms.BusinessFormSubmitedEvent" }
@@ -67,7 +67,7 @@ namespace Workflow.TestProject
                 {
                     ActionType = WorkflowActionType.SendSignal,
                     ActionNameTemplate = "{{entity.resultData.result}}", // Approved Or Declined
-                    WorkflowIdTemplate = "{{entity.OuterId}}" // Support Liqued Templates to resolve workflow id from event data
+                    WorkflowIdTemplate = "{{entity.outerId}}" // Support Liqued Templates to resolve workflow id from event data
 
                 },
                 Events = new string[] { "Workflow.TestProject.TaskAssignments.TaskCompletedEvent" }
@@ -84,21 +84,29 @@ namespace Workflow.TestProject
             var companyRegistrationForm = new BusinessFormSubmitedEvent
             {
                 Id = "54ED6B7F-EABF-47DB-8162-CBEF8A2DCC38",
-                FirstName = "Ben",
-                LastName = "Black",
-                Email = "ben.black@virtoway.com",
-                CompanyName = "VirtoCommerce",
-                Phone = "+36586633256",
-                TermConditonsAccepted = true
+                Type = "CompanyRegistrationForm",
+                Form = new JObject
+                {
+                    ["FirstName"] = "Ben",
+                    ["LastName"] = "Black",
+                    ["Email"] = "ben.black@virtoway.com",
+                    ["CompanyName"] = "VirtoCommerce",
+                    ["Phone"] = "+36586633256",
+                    ["TermConditonsAccepted"] = true
+                }
             };
 
-            // Fire and Forger
-            _eventPublisher.Publish(companyRegistrationForm);
+            // Fire and Forget
+            _eventPublisher.Publish(companyRegistrationForm); // Event-Event
+            // Or
+            //_stateMachine.Run(companyRegistrationForm); // Run (BusinessForm/Dummy) - Event | Workflow Meta Data, States, UI
+            // How to add a new workflow
+            // Start workflow + state machine meta data
 
             // TODO: Sleep ???
 
             // Workflow Should be started on SubmitFormSubsription
-            var workflowId = "BusinessFormSubmitedEvent-VirtoCommerce"; // Like WorkflowIdTemplate resolve it
+            var workflowId = "CompanyRegistrationForm-VirtoCommerce"; // Like WorkflowIdTemplate resolve it
             var workflowInfo = _workflowManager.GetWorkflow(workflowId);
 
             Assert.NotNull(workflowId);
@@ -116,6 +124,12 @@ namespace Workflow.TestProject
                 OuterId = workflowId,
                 InputData = JObject.FromObject(companyRegistrationForm)
             };
+        }
+
+        [Fact]
+        public void StateMachine_StartWorkflow()
+        {
+
         }
 
 

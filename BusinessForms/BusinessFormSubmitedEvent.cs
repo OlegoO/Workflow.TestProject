@@ -10,15 +10,7 @@ namespace Workflow.TestProject.BusinessForms
 {
     public class BusinessFormSubmitedEvent: DomainEvent
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-
-        public string Email { get; set; }
-
-        public string CompanyName { get; set; }
-
-        public string Phone { get; set; }
-
-        public bool TermConditonsAccepted { get; set; }
+        public string Type { get; set; }
+        public JObject Form { get; set; }
     }
 }
