@@ -6,5 +6,10 @@
 
         public string Name { get; set; }
         public string Status { get; set; }
+
+        internal IEnumerable<char> GetParameter(string workflowId, string v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

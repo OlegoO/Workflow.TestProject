@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Workflow.TestProject
 {
-    public class WorkflowUnitTest
+    public class BusinessFormUnitTest
     {
         IEventBusSubscriptionsManager _subscriptionsManager;
         IWorkflowManager _workflowManager;
@@ -16,7 +16,7 @@ namespace Workflow.TestProject
 
         public string WorkflowIdTemplate { get; private set; }
 
-        public WorkflowUnitTest()
+        public BusinessFormUnitTest()
         {
             _subscriptionsManager = new Mock<IEventBusSubscriptionsManager>().Object;
             _workflowManager = new Mock<IWorkflowManager>().Object;
@@ -84,7 +84,7 @@ namespace Workflow.TestProject
             var companyRegistrationForm = new BusinessFormSubmitedEvent
             {
                 Id = "54ED6B7F-EABF-47DB-8162-CBEF8A2DCC38",
-                Type = "CompanyRegistrationForm",
+                Type = "CompanyRegistration",
                 Form = new JObject
                 {
                     ["FirstName"] = "Ben",
@@ -106,7 +106,7 @@ namespace Workflow.TestProject
             // TODO: Sleep ???
 
             // Workflow Should be started on SubmitFormSubsription
-            var workflowId = "CompanyRegistrationForm-VirtoCommerce"; // Like WorkflowIdTemplate resolve it
+            var workflowId = "CompanyRegistration-VirtoCommerce"; // Like WorkflowIdTemplate resolve it
             var workflowInfo = _workflowManager.GetWorkflow(workflowId);
 
             Assert.NotNull(workflowId);
